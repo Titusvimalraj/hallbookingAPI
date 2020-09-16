@@ -94,7 +94,7 @@ app.post("/create-room", async function (req, res) {
                 res.status(500).json(apiResponse);
             }
             var db = client.db("hallbookings");
-            let insertData = await db.collection("halls").insertOne({ ...req.body, date: new Date(date) });
+            let insertData = await db.collection("halls").insertOne({ ...req.body, date: new Date(date), bookedStatus: false });
             client.close();
             let apiResponse = responseLib.sendResponse('Room Creation Successful', 200, insertData.ops[0]);
             res.status(200).json(apiResponse);
