@@ -107,9 +107,29 @@ app.post("/create-room", async function (req, res) {
 });
 
 
-app.get("/*", function (req, res) {
+app.get("/", function (req, res) {
+    res.redirect('https://documenter.getpostman.com/view/7987415/TVK8aKpq');
     let apiResponse = responseLib.sendErrorMessage('route not available in the application, params not proper or missing', 'Server Error', 404);
     res.status(500).json(apiResponse);
 })
+
+app.use(function (req, res, next) {
+    res.status(404);
+
+    // respond with html page
+    if (req.accepts('html')) {
+        res.render('404', { url: req.url });
+        return;
+    }
+
+    // respond with json
+    if (req.accepts('json')) {
+        res.send({ error: 'Not found' });
+        return;
+    }
+
+    // default to plain-text. send()
+    res.type('txt').send('Not found');
+});
 
 app.listen(process.env.PORT || 3000)
