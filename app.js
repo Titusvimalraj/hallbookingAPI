@@ -10,12 +10,12 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.get("/all-halls", function (req, res) {
-    mongoClient.connect(url, function (err, db) {
+    mongoClient.connect(url, function (err, client) {
         if (err) {
             let apiResponse = responseLib.sendErrorMessage('Something Went Wrong', 'Server Error', 500);
             res.status(500).json(apiResponse);
         }
-        // var db = client.db("hallbookings");
+        var db = client.db("hallbookings");
         var cursor = db.collection("halls").find().toArray();
         cursor.then(function (data) {
             delete data._id;
@@ -29,12 +29,12 @@ app.get("/all-halls", function (req, res) {
 });
 
 app.get("/all-customers", function (req, res) {
-    mongoClient.connect(url, function (err, db) {
+    mongoClient.connect(url, function (err, client) {
         if (err) {
             let apiResponse = responseLib.sendErrorMessage('Something Went Wrong', 'Server Error', 500);
             res.status(500).json(apiResponse);
         }
-        // var db = client.db("hallbookings");
+        var db = client.db("hallbookings");
         var cursor = db.collection("halls").find({ bookedStatus: true, customerName: { $exists: true } }).toArray();
         cursor.then(function (data) {
             delete data.bookedStatus;
@@ -51,13 +51,13 @@ app.get("/all-customers", function (req, res) {
 app.put("/book-hall/:id", function (req, res) {
     const { customerName, startDate, endDate } = { ...req.body };
     if (validator.checkValueIfEmpty([customerName, startDate, endDate]) && validator.checkAllParams({ ...req.body }) && validator.validateDate({ ...req.body })) {
-        mongoClient.connect(url, function (err, db) {
+        mongoClient.connect(url, function (err, client) {
 
             if (err) {
                 let apiResponse = responseLib.sendErrorMessage(err || 'unavailable room', 'Booking Room Unavailable', 500);
                 res.status(500).json(apiResponse);
             }
-            // var db = client.db("hallbookings");
+            var db = client.db("hallbookings");
             let updateData = { ...req.body, startDate: new Date(startDate), endDate: new Date(endDate), bookedStatus: true }
             db.collection("halls").updateOne(
                 { _id: mongodb.ObjectID(req.params.id), $or: [{ $or: [{ bookedStatus: false }, { endDate: { $lt: new Date() } }] }, { customerName: { $exists: false } }] },
@@ -88,12 +88,12 @@ app.post("/create-room", async function (req, res) {
     console.log(req.body);
     const { roomName, bookedStatus, date, amnesties, pricePerHour, numberOfSeats } = { ...req.body };
     if (validator.checkValueIfEmpty([roomName, bookedStatus, date, amnesties, pricePerHour, numberOfSeats]) && validator.checkAllParams({ ...req.body }, 'add')) {
-        mongoClient.connect(url, async function (err, db) {
+        mongoClient.connect(url, async function (err, client) {
             if (err) {
                 let apiResponse = responseLib.sendErrorMessage(err, 'Server Error', 500);
                 res.status(500).json(apiResponse);
             }
-            // var db = client.db("hallbookings");
+            var db = client.db("hallbookings");
             let insertData = await db.collection("halls").insertOne({ ...req.body, date: new Date(date) });
             client.close();
             let apiResponse = responseLib.sendResponse('Room Creation Successful', 200, insertData.ops[0]);
