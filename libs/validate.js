@@ -15,7 +15,7 @@ let checkAllParams = (bodyParams, action = '') => {
     if (action === 'add') {
         paramsList = ["roomName", "bookedStatus", "date", "amnesties", "pricePerHour", "numberOfSeats"];
     } else {
-        paramsList = ["customerName", "date", "startDate", "endDate"];
+        paramsList = ["customerName", "startDate", "endDate"];
     }
     return Object.entries(bodyParams).every((el => paramsList.includes(el[0])));
 }
