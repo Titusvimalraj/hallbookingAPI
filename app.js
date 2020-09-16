@@ -112,4 +112,4 @@ app.get("/*", function (req, res) {
     res.status(500).json(apiResponse);
 })
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000)
