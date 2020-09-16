@@ -5,7 +5,7 @@ const responseLib = require('./libs/generateResponse');
 const app = express();
 const bodyParser = require("body-parser");
 const mongoClient = mongodb.MongoClient;
-const url = "mongodb://localhost:27017";
+const url = process.env.MONGO_URL || "mongodb://localhost:27017";
 app.use(bodyParser.urlencoded({
     extended: true
 }));
